@@ -1,9 +1,6 @@
-2026-07-15T19:33:47+0530 | INFO     | Job start | input=data.csv config=config.yaml output=metrics.json log_file=run.log
-2026-07-15T19:33:47+0530 | INFO     | Config loaded + validated | seed=42 window=5 version=v1
-2026-07-15T19:33:47+0530 | INFO     | Random seed set | seed=42
-2026-07-15T19:33:47+0530 | INFO     | Dataset loaded | rows=10000 columns=['timestamp', 'open', 'high', 'low', 'close', 'volume_btc', 'volume_usd']
-2026-07-15T19:33:47+0530 | INFO     | Rolling mean computed | window=5
-2026-07-15T19:33:47+0530 | INFO     | Signal generated | warmup_rows_defaulted_to_0=4 signal_rate=0.4989
-2026-07-15T19:33:47+0530 | INFO     | Metrics summary | rows_processed=10000 signal_rate=0.4989 latency_ms=58
-2026-07-15T19:33:47+0530 | INFO     | Metrics written to metrics.json
-2026-07-15T19:33:47+0530 | INFO     | Job end | status=success
+2026-07-15T19:57:15+0530 | INFO     | Job start | input=nonexistent.csv config=config.yaml output=metrics.json log_file=run.log
+2026-07-15T19:57:15+0530 | INFO     | Config loaded + validated | seed=42 window=5 version=v1
+2026-07-15T19:57:15+0530 | INFO     | Random seed set | seed=42
+2026-07-15T19:57:15+0530 | ERROR    | Validation/processing error: Input data file not found: nonexistent.csv
+2026-07-15T19:57:15+0530 | INFO     | Metrics written to metrics.json
+2026-07-15T19:57:15+0530 | INFO     | Job end | status=error
