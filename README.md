@@ -117,8 +117,8 @@ Follow these exact steps to clone, set up, and run the pipeline locally.
 ### 1. Clone and Navigate to the Repository
 Copy and run these commands to fetch the repository and change directory:
 ```bash
-git clone https://github.com/shaawtymaker/ML_Ops-Batch-job.git mlops-batch-job-development
-cd mlops-batch-job-development
+git clone https://github.com/shaawtymaker/ML_Ops-Batch-job.git 
+cd ML_Ops-Batch-job
 ```
 
 ### 2. Set Up a Virtual Environment
@@ -157,11 +157,7 @@ pip install -r requirements.txt
 The application runs using exactly four parameterized CLI arguments. There are **no hard-coded paths** within the script.
 
 ```bash
-python run.py \
-  --input <input_csv_path> \
-  --config <config_yaml_path> \
-  --output <output_metrics_json_path> \
-  --log-file <output_run_log_path>
+python run.py --input data.csv --config config.yaml --output metrics.json --log-file run.log
 ```
 
 ### Argument Details:
@@ -333,33 +329,4 @@ docker rm mlops-task-run
 
 ---
 
-## Local Verification & Troubleshooting Checklist
-
-Before committing code, verify the local execution setup using these commands:
-
-### 1. Local Run (Success Path)
-Execute the batch job using the standard dataset and configuration:
-```bash
-python run.py --input data.csv --config config.yaml --output metrics.json --log-file run.log
-```
-#### Checks:
-- [ ] Confirms the success JSON is printed to the terminal.
-- [ ] Confirms `metrics.json` and `run.log` files are created at the root level.
-- [ ] Confirms the exit status code is `0`:
-  *   **Linux / macOS**: `echo $?` (should print `0`)
-  *   **Windows (PowerShell)**: `echo $LASTEXITCODE` (should print `0`)
-  *   **Windows (CMD)**: `echo %errorlevel%` (should print `0`)
-
-### 2. Local Run (Failure Path)
-Execute the batch job using a missing CSV path to test error handling:
-```bash
-python run.py --input nonexistent.csv --config config.yaml --output metrics.json --log-file run.log
-```
-#### Checks:
-- [ ] Confirms that it prints an error JSON with `"status": "error"` and the error message.
-- [ ] Confirms `metrics.json` is overwritten with the error JSON content.
-- [ ] Confirms the exit status code is `1` (non-zero):
-  *   **Linux / macOS**: `echo $?` (should print `1`)
-  *   **Windows (PowerShell)**: `echo $LASTEXITCODE` (should print `1`)
-  *   **Windows (CMD)**: `echo %errorlevel%` (should print `1`)
 
