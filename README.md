@@ -1,5 +1,12 @@
 # MLOps Batch Signal Pipeline — T0 Technical Assessment
 
+![Python](https://img.shields.io/badge/python-3.9+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/pandas-2.2.2-150458?style=flat-square&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/numpy-1.26.4-013243?style=flat-square&logo=numpy&logoColor=white)
+![YAML](https://img.shields.io/badge/yaml-config-CB171E?style=flat-square&logo=yaml&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)
+![GitHub](https://img.shields.io/badge/github-tracked-181717?style=flat-square&logo=github&logoColor=white)
+
 A production-grade, highly observable, reproducible, and containerized MLOps batch job pipeline built in Python. This project computes a rolling-mean-based binary trading signal on OHLCV market data, designed to mirror the trading signal pipelines used in **MetaStackerBandit**.
 
 ---
@@ -103,22 +110,45 @@ Pinned packages in `requirements.txt`:
 
 ---
 
-## Local Environment Setup
+## Local Environment Setup & Execution Walkthrough
 
-1. **Clone or navigate** to the repository root directory.
-2. **Create a virtual environment** (recommended to isolate dependencies):
-   ```bash
-   python3 -m venv .venv
-   ```
-3. **Activate the virtual environment**:
-   *   **Linux/macOS**: `source .venv/bin/activate`
-   *   **Windows (PowerShell)**: `.venv\Scripts\Activate.ps1`
-   *   **Windows (CMD)**: `.venv\Scripts\activate.bat`
-4. **Install the dependencies**:
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
+Follow these exact steps to clone, set up, and run the pipeline locally.
+
+### 1. Clone and Navigate to the Repository
+Copy and run these commands to fetch the repository and change directory:
+```bash
+git clone https://github.com/shaawtymaker/ML_Ops-Batch-job.git mlops-batch-job-development
+cd mlops-batch-job-development
+```
+
+### 2. Set Up a Virtual Environment
+Create a clean virtual environment to isolate the project's dependencies:
+```bash
+python3 -m venv .venv
+```
+
+### 3. Activate the Virtual Environment
+Activate the environment depending on your operating system and terminal shell:
+
+*   **Linux / macOS (Bash/Zsh)**:
+    ```bash
+    source .venv/bin/activate
+    ```
+*   **Windows (PowerShell)**:
+    ```powershell
+    .venv\Scripts\Activate.ps1
+    ```
+*   **Windows (CMD)**:
+    ```cmd
+    .venv\Scripts\activate.bat
+    ```
+
+### 4. Install Pinned Dependencies
+Upgrade package manager tools and install dependencies:
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
 
 ---
 
@@ -262,21 +292,38 @@ Determinism is guaranteed across environments:
 
 The pipeline includes a `Dockerfile` built on `python:3.9-slim` to ensure a self-contained runtime environment.
 
-### Building the Image
-From the repository root directory, run:
+### 1. Build the Docker Image
+Run this build command from the repository root:
 ```bash
 docker build -t mlops-task .
 ```
 
-### Running the Container
-Run the built container using the default entry point:
+### 2. Run the Container (Success Path)
+Run the default pipeline built into the container:
 ```bash
 docker run --rm mlops-task
 ```
-*   **What this does**: Copies the files inside the container, runs the script, prints the success metrics JSON to `stdout`, and exits with code `0`.
+*   **Action**: Copies root files, executes the pipeline, prints the success metrics JSON to `stdout`, and exits with code `0`.
 
-### Extracting Output Files from the Container
-If you need to copy the generated `metrics.json` and `run.log` files out of the container to your host machine:
+#### To Check the Exit Status:
+*   **Linux / macOS**: `echo $?`
+*   **Windows (PowerShell)**: `echo $LASTEXITCODE`
+*   **Windows (CMD)**: `echo %errorlevel%`
+
+### 3. Run the Container (Failure Path)
+Run the pipeline pointing to a non-existent file inside the container:
+```bash
+docker run --rm mlops-task python run.py --input nonexistent.csv --config config.yaml --output metrics.json --log-file run.log
+```
+*   **Action**: Prints the structured error metrics JSON to `stdout`, and exits with a non-zero code (`1`).
+
+#### To Check the Exit Status:
+*   **Linux / macOS**: `echo $?`
+*   **Windows (PowerShell)**: `echo $LASTEXITCODE`
+*   **Windows (CMD)**: `echo %errorlevel%`
+
+### 4. Extracting Output Files from the Container
+If you need to extract the files generated inside the container runtime to your host:
 ```bash
 docker run --name mlops-task-run mlops-task
 docker cp mlops-task-run:/app/metrics.json ./metrics.json
@@ -290,17 +337,29 @@ docker rm mlops-task-run
 
 Before committing code, verify the local execution setup using these commands:
 
-### 1. Verify Local Execution
+### 1. Local Run (Success Path)
+Execute the batch job using the standard dataset and configuration:
 ```bash
 python run.py --input data.csv --config config.yaml --output metrics.json --log-file run.log
 ```
-- [ ] Confirms the JSON structure is printed to the terminal.
-- [ ] Confirms `metrics.json` and `run.log` files are created.
-- [ ] Confirms the exit status code is `0` (`echo $LASTEXITCODE` in PowerShell, or `echo %errorlevel%` in CMD).
+#### Checks:
+- [ ] Confirms the success JSON is printed to the terminal.
+- [ ] Confirms `metrics.json` and `run.log` files are created at the root level.
+- [ ] Confirms the exit status code is `0`:
+  *   **Linux / macOS**: `echo $?` (should print `0`)
+  *   **Windows (PowerShell)**: `echo $LASTEXITCODE` (should print `0`)
+  *   **Windows (CMD)**: `echo %errorlevel%` (should print `0`)
 
-### 2. Verify Fault-Tolerance (Error Case)
+### 2. Local Run (Failure Path)
+Execute the batch job using a missing CSV path to test error handling:
 ```bash
 python run.py --input nonexistent.csv --config config.yaml --output metrics.json --log-file run.log
 ```
-- [ ] Confirms that it prints an error JSON with `"status": "error"`.
-- [ ] Confirms that the command exits with code `1` (`echo $LASTEXITCODE` should return `1`).
+#### Checks:
+- [ ] Confirms that it prints an error JSON with `"status": "error"` and the error message.
+- [ ] Confirms `metrics.json` is overwritten with the error JSON content.
+- [ ] Confirms the exit status code is `1` (non-zero):
+  *   **Linux / macOS**: `echo $?` (should print `1`)
+  *   **Windows (PowerShell)**: `echo $LASTEXITCODE` (should print `1`)
+  *   **Windows (CMD)**: `echo %errorlevel%` (should print `1`)
+
