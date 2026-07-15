@@ -180,8 +180,11 @@ def load_dataset(input_path: str, logger: logging.Logger) -> pd.DataFrame:
 
     if not pd.api.types.is_numeric_dtype(df[REQUIRED_COLUMN]):
         df[REQUIRED_COLUMN] = pd.to_numeric(df[REQUIRED_COLUMN], errors="coerce")
-        if df[REQUIRED_COLUMN].isna().all():
-            raise PipelineError(f"Column '{REQUIRED_COLUMN}' is non-numeric")
+
+    if df[REQUIRED_COLUMN].isna().any():
+        raise PipelineError(
+            f"Column '{REQUIRED_COLUMN}' contains missing, NaN, or non-numeric values."
+        )
 
     logger.info("Dataset loaded | rows=%d columns=%s", len(df), list(df.columns))
     return df
